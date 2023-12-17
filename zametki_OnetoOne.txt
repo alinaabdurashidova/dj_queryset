@@ -1,0 +1,73 @@
+>>> from OnetoOneApp.models import CapitalCity, Country
+
+>>> city1 = CapitalCity.objects.create(cityname = 'Bishkek', strength = 976734)
+>>> city2 = CapitalCity.objects.create(cityname = 'Berlin', strength = 3677472)
+>>> city3 = CapitalCity.objects.create(cityname = 'Vienna', strength = 1897097)
+>>> country1 = Country.objects.create(name = 'Kyrgyzstan', language = 'kyrgyz', capital_city = city1)
+>>> country2 = Country.objects.create(name = 'Germany', language = 'deutsch', capital_city = city2)
+>>> country3 = Country.objects.create(name = 'Austria', language = 'deutsch', capital_city = city3)
+
+>>> CapitalCity.objects.all()
+<QuerySet [<CapitalCity: CapitalCity object (1)>, <CapitalCity: CapitalCity object (2)>, <CapitalCity: CapitalCity object (3)>]>
+>>> Country.objects.all()
+<QuerySet [<Country: Country object (1)>, <Country: Country object (2)>, <Country: Country object (3)>]>
+
+>>> Country.objects.filter(language = 'deutsch')
+<QuerySet [<Country: Country object (2)>, <Country: Country object (3)>]>
+
+>>> city = CapitalCity.objects.get(cityname = 'Bishkek')
+>>> city.countries
+<Country: Country object (1)>
+
+>>> country = CapitalCity.objects.get(country__name='Kyrgyzstan')
+>>> country.countries
+<Country: Country object (1)>
+
+>>> country2 = Country.objects.get(name = 'Germany')
+>>> country2.name = 'Deutschland'
+>>> country2.save()
+>>> country2
+<Country: Deutschland : Berlin>
+
+>>> country3 = Country.objects.get(name = 'Austria')
+>>> country3.delete()
+(1, {'OnetoOneApp.Country': 1})
+>>> city3 = CapitalCity.objects.get(cityname = 'Vienna')
+>>> city3.delete()
+(1, {'OnetoOneApp.CapitalCity': 1})
+>>> Country.objects.all()
+<QuerySet [<Country: Kyrgyzstan : Bishkek>, <Country: Deutschland : Berlin>]>
+
+>>> Country.objects.count()
+2
+
+>>> from django.db.models import *
+>>> total_strength = CapitalCity.objects.aggregate(total_strength=Sum('strength'))['total_strength']
+>>> total_strength
+4654206
+
+>>> average_strength = CapitalCity.objects.aggregate(average_strength=Avg('strength'))['average_strength']
+>>> average_strength
+2327.5
+
+>>> more_million = CapitalCity.objects.filter(strength__gt = 1000000)
+>>> more_million
+<QuerySet [<CapitalCity: Berlin>]>
+
+>>> slow_million = CapitalCity.objects.filter(strength__lt = 1000000)
+>>> slow_million
+<QuerySet [<CapitalCity: Bishkek>]>
+
+>>> countries_containing_land = Country.objects.filter(name__contains='land')
+>>> countries_containing_land
+<QuerySet [<Country: Deutschland : Berlin>]>
+
+>>> more_or_equal = CapitalCity.objects.filter(strength__gte = 1000000)
+>>> more_or_equal
+<QuerySet [<CapitalCity: Berlin>]>
+
+>>> slow_or_equal = CapitalCity.objects.filter(strength__lte = 1000000)
+>>> slow_or_equal
+<QuerySet [<CapitalCity: Bishkek>]>
+
+>>> exit()
